@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 public class quality
 {
     // Define mod id in a common place for everything to reference
-    public static final String MODID = "qom";
+    public static final String MODID = "quality";
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
