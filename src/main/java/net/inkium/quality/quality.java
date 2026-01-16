@@ -7,6 +7,7 @@ import net.inkium.quality.commands.home.setHomeCommand;
 import net.inkium.quality.commands.tpa.tpaAccept;
 import net.inkium.quality.commands.tpa.tpaCommand;
 import net.inkium.quality.commands.tpa.tpaDeny;
+import net.inkium.quality.enchants.pain;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -42,6 +43,8 @@ public class quality
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+
+        pain.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
 //        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
