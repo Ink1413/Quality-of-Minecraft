@@ -38,12 +38,6 @@ public class tpaManager {
 
     }
 
-    public static tpaRequest getRequest(UUID targetId) {
-
-        return pendingTPA.get(targetId);
-
-    }
-
     public static tpaRequest removeRequest(UUID targetId) {
 
         return pendingTPA.remove(targetId);

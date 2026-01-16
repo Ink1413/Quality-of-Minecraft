@@ -1,6 +1,9 @@
 package net.inkium.quality;
 
 import com.mojang.logging.LogUtils;
+import net.inkium.quality.commands.home.delHomeCommand;
+import net.inkium.quality.commands.home.homeCommand;
+import net.inkium.quality.commands.home.setHomeCommand;
 import net.inkium.quality.commands.tpa.tpaAccept;
 import net.inkium.quality.commands.tpa.tpaCommand;
 import net.inkium.quality.commands.tpa.tpaDeny;
@@ -26,14 +29,6 @@ public class quality
     public static final String MODID = "quality";
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
-
-    public static void onRegisterCommands(RegisterCommandsEvent event) {
-
-        tpaCommand.register(event.getDispatcher());
-        tpaDeny.register(event.getDispatcher());
-        tpaAccept.register(event.getDispatcher());
-
-    }
 
     public quality(FMLJavaModLoadingContext context)
     {
@@ -77,6 +72,25 @@ public class quality
     {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
+    }
+
+    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class ServerEvent {
+
+        @SubscribeEvent
+        public static void onRegisterCommands(RegisterCommandsEvent event) {
+
+            //tpa
+            tpaCommand.register(event.getDispatcher());
+            tpaDeny.register(event.getDispatcher());
+            tpaAccept.register(event.getDispatcher());
+
+            //home
+            delHomeCommand.register(event.getDispatcher());
+            homeCommand.register(event.getDispatcher());
+            setHomeCommand.register(event.getDispatcher());
+
+        }
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
