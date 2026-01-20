@@ -14,7 +14,7 @@ public class pain {
             DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, quality.MODID);
 
     public static final RegistryObject<Enchantment> SMELT_ENCHANT =
-            ENCHANTMENTS.register("smelt-enchant", smeltEnchant::new);
+            ENCHANTMENTS.register("molten", smeltEnchant::new);
 
     public static void register(IEventBus bus) {
 

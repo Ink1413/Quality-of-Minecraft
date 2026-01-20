@@ -10,7 +10,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -28,10 +30,10 @@ public class smeltEnchantHandler {
 
         ItemStack tool = event.getPlayer().getMainHandItem();
 
-        int autoSmeltLevel = EnchantmentHelper.getItemEnchantmentLevel(
+        int moltenLevel = EnchantmentHelper.getItemEnchantmentLevel(
                 pain.SMELT_ENCHANT.get(), tool);
 
-        if (autoSmeltLevel == 0) return;
+        if (moltenLevel == 0) return;
 
         BlockState state = event.getState();
         BlockPos pos = event.getPos();
@@ -53,7 +55,7 @@ public class smeltEnchantHandler {
                 ItemStack result = recipe.get().getResultItem(serverLevel.registryAccess()).copy();
                 result.setCount(drop.getCount());
 
-                // Drop the smelted item
+
                 Block.popResource(serverLevel, pos, result);
 
             } else {
@@ -67,6 +69,40 @@ public class smeltEnchantHandler {
 
 
         serverLevel.destroyBlock(pos, false, event.getPlayer());
+    }
+
+    private static ItemStack getSmeltedResult(ItemStack drop, BlockState state, ServerLevel level, BlockPos pos) {
+
+        if(state.is(Blocks.STONE)) {
+
+            return new ItemStack(Blocks.SMOOTH_STONE);
+
+        }
+
+        if (state.is(Blocks.SANDSTONE)) {
+
+            return new ItemStack(Blocks.SMOOTH_SANDSTONE);
+
+        }
+
+        if (state.is(Blocks.RED_SANDSTONE)) {
+
+            return new ItemStack(Blocks.SMOOTH_RED_SANDSTONE);
+
+        }
+
+        if (state.is(Blocks.QUARTZ_BLOCK)) {
+
+            return new ItemStack(Blocks.SMOOTH_QUARTZ);
+
+        }
+
+        Optional<SmeltingRecipe> recipe = level.getRecipeManager()
+                .getRecipeFor(RecipeType.SMELTING, new SimpleContainer(drop), level);
+
+        return recipe.map(smeltingRecipe -> smeltingRecipe.getResultItem(level.registryAccess()).copy())
+                .orElse(null);
+
     }
 
 }
