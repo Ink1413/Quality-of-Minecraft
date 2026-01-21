@@ -31,7 +31,7 @@ public class smeltEnchantHandler {
         ItemStack tool = event.getPlayer().getMainHandItem();
 
         int moltenLevel = EnchantmentHelper.getItemEnchantmentLevel(
-                pain.SMELT_ENCHANT.get(), tool);
+                pain.MOLTEN.get(), tool);
 
         if (moltenLevel == 0) return;
 
