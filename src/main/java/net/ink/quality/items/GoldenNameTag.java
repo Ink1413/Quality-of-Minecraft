@@ -20,12 +20,11 @@ public class GoldenNameTag extends Item {
 
     }
 
-    @Override
-    public InteractionResultHolder<ItemStack> use (Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
         ItemStack itemStack = player.getItemInHand(hand);
 
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+        if (player instanceof ServerPlayer serverPlayer) {
 
             serverPlayer.openMenu(new SimpleMenuProvider(
                     (id, inv, p) -> new CustomContainerMenu(id, inv, itemStack),
@@ -37,5 +36,4 @@ public class GoldenNameTag extends Item {
         return InteractionResultHolder.success(itemStack);
 
     }
-
 }
