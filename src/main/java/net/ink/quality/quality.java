@@ -8,7 +8,12 @@ import net.ink.quality.commands.tpa.tpaAccept;
 import net.ink.quality.commands.tpa.tpaCommand;
 import net.ink.quality.commands.tpa.tpaDeny;
 import net.ink.quality.enchants.pain;
+import net.ink.quality.gui.CustomContainerScreen;
+import net.ink.quality.gui.suffer;
+import net.ink.quality.items.ItemsCurious;
+import net.ink.quality.network.networking;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -46,8 +51,12 @@ public class quality
 
         pain.register(modEventBus);
 
-        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-//        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        ItemsCurious.register(modEventBus);
+
+        suffer.register(modEventBus);
+
+        networking.register();
+
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -101,11 +110,19 @@ public class quality
     public static class ClientModEvents
     {
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
+        public static void onClientSetup(FMLClientSetupEvent event) {
+
+            MenuScreens.register(suffer.CUSTOM_MENU.get(), CustomContainerScreen::new);
+
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+
+
+
         }
+
+
+
     }
 }
