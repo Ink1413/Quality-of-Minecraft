@@ -11,15 +11,12 @@ import net.minecraftforge.registries.RegistryObject;
 public class suffer {
 
     public static final DeferredRegister<MenuType<?>> MENUS =
-            DeferredRegister.create(ForgeRegistries.MENU_TYPES, quality.MODID);
-
-    public static final RegistryObject<MenuType<GoldenNameTagMenu>> GOLDEN_NAMETAG_MENU =
-            MENUS.register("golden_nametag_menu", () ->
-                    IForgeMenuType.create(GoldenNameTagMenu::new));
+            DeferredRegister.create(ForgeRegistries.MENU_TYPES, "quality");
 
     public static final RegistryObject<MenuType<CustomContainerMenu>> CUSTOM_MENU =
-            MENUS.register("custom_menu", () ->
-                    IForgeMenuType.create((windowId, inv, data) -> new CustomContainerMenu(windowId, inv)));
+            MENUS.register("custom_golden_menu",
+                    () ->IForgeMenuType.create(CustomContainerMenu::new));
+
 
     public static void register(IEventBus eventBus) {
 

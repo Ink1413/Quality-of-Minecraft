@@ -42,9 +42,6 @@ public class NameTagUpdatePacket {
             ServerPlayer player = ctx.getSender();
             if (player != null && player.containerMenu instanceof CustomContainerMenu menu) {
 
-                menu.setTitleText(this.name);
-                menu.setSubtitleText(this.lore);
-
             }
 
         });
