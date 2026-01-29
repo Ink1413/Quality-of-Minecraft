@@ -10,44 +10,30 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class networking {
 
-    private static SimpleChannel INSTANCE;
+    private static final String PROTOCOL_VERSION = "1";
+    public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation("quality", "main"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
+    );
+
     private static int packetId = 0;
 
     private static int id() {
-
         return packetId++;
-
     }
 
     public static void register() {
-
-        SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(quality.MODID, "messages"))
-                .networkProtocolVersion(() -> "1.0")
-                .clientAcceptedVersions(s -> true)
-                .serverAcceptedVersions(s -> true)
-                .simpleChannel();
-
-        INSTANCE = net;
-
-        net.messageBuilder(NameTagUpdatePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+        INSTANCE.messageBuilder(NameTagUpdatePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(NameTagUpdatePacket::new)
-                .encoder(NameTagUpdatePacket::toBytes)
+                .encoder(NameTagUpdatePacket::encode)
                 .consumerMainThread(NameTagUpdatePacket::handle)
                 .add();
-
     }
 
-    public static <MSG> void sendToServer(MSG message) {
-
-        INSTANCE.sendToServer(message);
-
-    }
-
-    public static <MSG> void sendToClient(MSG message, ServerPlayer player) {
-
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
-
+    public static void sendToServer(Object msg) {
+        INSTANCE.sendToServer(msg);
     }
 
 }

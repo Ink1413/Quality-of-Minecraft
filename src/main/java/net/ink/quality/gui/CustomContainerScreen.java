@@ -9,8 +9,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.ink.quality.quality;
-
 
 public class CustomContainerScreen extends AbstractContainerScreen<CustomContainerMenu> {
 
@@ -37,11 +35,11 @@ public class CustomContainerScreen extends AbstractContainerScreen<CustomContain
     // Same size as red bars: 109x15
     // Milk brown bar (unfocused) - the lighter top one
     private static final int UNFOCUSED_BAR_U = 0;
-    private static final int UNFOCUSED_BAR_V = 166;  // Adjust if needed
+    private static final int UNFOCUSED_BAR_V = 166;
 
     // Dark brown bar (focused) - the darker bottom one
     private static final int FOCUSED_BAR_U = 0;
-    private static final int FOCUSED_BAR_V = 182;    // Adjust if needed (166 + 15 = 181)
+    private static final int FOCUSED_BAR_V = 182;
 
     private static final int BAR_WIDTH = 109;
     private static final int BAR_HEIGHT = 15;
@@ -59,9 +57,9 @@ public class CustomContainerScreen extends AbstractContainerScreen<CustomContain
     protected void init() {
         super.init();
 
-        // Create name text field (with 2px padding inside the bar)
+        // Create name text field - use full bar dimensions for click detection
         this.nameField = new EditBox(this.font, this.leftPos + NAME_FIELD_X + 2, this.topPos + NAME_FIELD_Y + 3,
-                NAME_FIELD_WIDTH - 4, NAME_FIELD_HEIGHT - 4, Component.literal("Name"));
+                NAME_FIELD_WIDTH - 4, 12, Component.literal("Name"));
         this.nameField.setCanLoseFocus(true);
         this.nameField.setTextColor(-1);
         this.nameField.setTextColorUneditable(-1);
@@ -71,9 +69,9 @@ public class CustomContainerScreen extends AbstractContainerScreen<CustomContain
         this.nameField.setResponder(this::onNameChanged);
         this.addWidget(this.nameField);
 
-        // Create lore text field (with 2px padding inside the bar)
+        // Create lore text field - use full bar dimensions for click detection
         this.loreField = new EditBox(this.font, this.leftPos + LORE_FIELD_X + 2, this.topPos + LORE_FIELD_Y + 3,
-                LORE_FIELD_WIDTH - 4, LORE_FIELD_HEIGHT - 4, Component.literal("Lore"));
+                LORE_FIELD_WIDTH - 4, 12, Component.literal("Lore"));
         this.loreField.setCanLoseFocus(true);
         this.loreField.setTextColor(-1);
         this.loreField.setTextColorUneditable(-1);
@@ -82,6 +80,10 @@ public class CustomContainerScreen extends AbstractContainerScreen<CustomContain
         this.loreField.setValue(this.menu.getItemLore()); // Load existing lore
         this.loreField.setResponder(this::onLoreChanged);
         this.addWidget(this.loreField);
+
+        // Make both fields active
+        this.nameField.setEditable(true);
+        this.loreField.setEditable(true);
 
         // Set initial focus to name field
         this.setInitialFocus(this.nameField);
@@ -106,19 +108,23 @@ public class CustomContainerScreen extends AbstractContainerScreen<CustomContain
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Allow typing in text fields
-        if (this.nameField.isFocused()) {
-            if (keyCode == 256) { // Escape
-                this.nameField.setFocused(false);
+        // If either field is focused, handle special keys
+        if (this.nameField.isFocused() || this.loreField.isFocused()) {
+            if (keyCode == 256) { // Escape - close GUI
+                this.minecraft.player.closeContainer();
                 return true;
             }
+            // Prevent 'E' or other inventory keys from closing GUI while typing
+            if (keyCode == 69) { // E key
+                return true; // Block it
+            }
+        }
+
+        // Forward key presses to focused field
+        if (this.nameField.isFocused()) {
             return this.nameField.keyPressed(keyCode, scanCode, modifiers);
         }
         if (this.loreField.isFocused()) {
-            if (keyCode == 256) { // Escape
-                this.loreField.setFocused(false);
-                return true;
-            }
             return this.loreField.keyPressed(keyCode, scanCode, modifiers);
         }
 
@@ -139,15 +145,47 @@ public class CustomContainerScreen extends AbstractContainerScreen<CustomContain
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.nameField.mouseClicked(mouseX, mouseY, button)) {
+        // Manually check if click is within name field bar area
+        boolean clickedName = mouseX >= this.leftPos + NAME_FIELD_X &&
+                mouseX <= this.leftPos + NAME_FIELD_X + NAME_FIELD_WIDTH &&
+                mouseY >= this.topPos + NAME_FIELD_Y &&
+                mouseY <= this.topPos + NAME_FIELD_Y + NAME_FIELD_HEIGHT;
+
+        // Manually check if click is within lore field bar area
+        boolean clickedLore = mouseX >= this.leftPos + LORE_FIELD_X &&
+                mouseX <= this.leftPos + LORE_FIELD_X + LORE_FIELD_WIDTH &&
+                mouseY >= this.topPos + LORE_FIELD_Y &&
+                mouseY <= this.topPos + LORE_FIELD_Y + LORE_FIELD_HEIGHT;
+
+        if (clickedName) {
+            this.nameField.setFocused(true);
             this.loreField.setFocused(false);
             return true;
         }
-        if (this.loreField.mouseClicked(mouseX, mouseY, button)) {
+
+        if (clickedLore) {
+            this.loreField.setFocused(true);
             this.nameField.setFocused(false);
             return true;
         }
+
+        // Clicked elsewhere - unfocus both
+        this.nameField.setFocused(false);
+        this.loreField.setFocused(false);
+
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        // This handles actual character input (letters, numbers, etc.)
+        if (this.nameField.isFocused()) {
+            return this.nameField.charTyped(codePoint, modifiers);
+        }
+        if (this.loreField.isFocused()) {
+            return this.loreField.charTyped(codePoint, modifiers);
+        }
+        return super.charTyped(codePoint, modifiers);
     }
 
     @Override
@@ -201,8 +239,12 @@ public class CustomContainerScreen extends AbstractContainerScreen<CustomContain
 
     @Override
     public void onClose() {
-        // Save the name and lore to the item when closing
-        this.menu.saveToItem();
+        // Send packet to server to save the name and lore
+        networking.sendToServer(new NameTagUpdatePacket(
+                this.menu.getSlotIndex(),
+                this.nameField.getValue(),
+                this.loreField.getValue()
+        ));
         super.onClose();
     }
 

@@ -8,9 +8,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CustomContainerMenu extends AbstractContainerMenu {
 
     private final ItemStack goldenNameTag;
@@ -33,7 +30,7 @@ public class CustomContainerMenu extends AbstractContainerMenu {
         loadFromItem();
 
         // Add player inventory slots
-        // First slot at x=7, y=83 (from user's measurements)
+        // First slot at x=7, y=83 (adjusted by 1 pixel)
         int inventoryStartX = 8;
         int inventoryStartY = 84;
 
@@ -46,7 +43,7 @@ public class CustomContainerMenu extends AbstractContainerMenu {
         }
 
         // Hotbar (1 row of 9 slots) - with 4 pixel gap below main inventory
-        int hotbarY = inventoryStartY + (3 * 18) + 4; // 83 + 54 + 4 = 141
+        int hotbarY = inventoryStartY + (3 * 18) + 4; // 84 + 54 + 4 = 142
         for (int col = 0; col < 9; col++) {
             this.addSlot(new Slot(playerInventory, col, inventoryStartX + col * 18, hotbarY));
         }
@@ -109,6 +106,10 @@ public class CustomContainerMenu extends AbstractContainerMenu {
 
     public void setItemLore(String lore) {
         this.itemLore = lore;
+    }
+
+    public int getSlotIndex() {
+        return slotIndex;
     }
 
     @Override
